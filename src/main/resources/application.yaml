@@ -1,0 +1,79 @@
+spring:
+    application:
+        name: Altair
+    jpa:
+        hibernate:
+            ddl-auto: update
+    datasource:
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/test
+        username: testaltair
+        password: testaltair
+    thymeleaf:
+        cache: false
+    mvc:
+        log-request-details: true
+        async:
+            request-timeout: 60000
+logging:
+    level:
+        org:
+            springframework: INFO
+        com:
+            aajpm:
+                altair:
+                    utility: TRACE
+
+                
+altair:
+    security:
+        max-attempts: 3                         # Maximum number of failed login attempts before the account is locked
+        lockout-time: 300                       # Time in seconds that the account is locked after too many failed login attempts
+        default-password: hikoboshi             # Default password for the admin, please change this after deployment
+    observatory:
+        status-update-interval: 5000            # Interval in ms between status updates for the observatory. If set too fast, it might hang the server/devices.
+        synchronous-timeout: 120000             # Timeout in ms for synchronous operations (mainly slews). If set too high, failed operations might never finish, and if set too low, some successful operations might get interrupted. Set to 0 to disable timeouts (not recommended).
+        use-native-slaving: false               # If true, Altair will use the native slaving capabilities of the mount, if available. Else, Altair will use its own slaving mechanism.
+        disable-safety-checks: true             # If true, Altair will not check if the conditions are safe to operate before slewing. This is not recommended, as it might cause damage to the mount. Use only if you really know what you are doing.
+        dome:
+            is-naughty: false                   # If true, Altair will not use isParked() and atHome() to check if the dome is parked and at home, respectively. Use only for devices who can find park or find home but fail to report it correctly.
+            naughty-tolerance: 3.0              # Tolerance in degrees for finding the position of the dome, if naughty mode is enabled. If it is disabled, this does nothing.
+        camera:
+            max-cooldown-rate: 2.5              # Maximum cooldown rate for the camera, in °C/min, if hardware does not support auto ramping.
+            min-cooldown-rate: 0.5              # Minimum cooldown rate for the camera, in °C/min, if hardware does not support auto ramping. If it cools down too slowly, the cooler will stop cooling it further.
+            max-warmup-rate: 1.5                # Maximum warmup rate for the camera, in °C/min, if hardware does not support auto ramping.
+            target-cooling: -10.0               # Target temperature for the camera when in auto mode, in °C
+            cooler-saturation-threshold: 95.0   # If the cooler reaches this power level, it is considered saturated
+            image-buffer-size: 268435456        # Size of the image processing buffer, in bytes. Use '-1' to disable the limiter and use the maximum available memory.
+        focuser:
+            backlash-steps: 0                   # Amount of backlash in the focuser, in steps. Set to 0 to disable backlash compensation.
+            position-tolerance: 5               # Tolerance for the focuser position, in steps. If the focuser is within this tolerance, it is considered to be at the target position.
+        filter-wheel:
+            filter-names:                       # Names of the filters in the filter wheel, in the order they are installed. If empty, Altair will use the service provided ones.
+                - Luminance
+                - Luminance
+                - Blue
+                - Green
+                - OIII
+                - Red
+                - SII
+                - Ha
+            focus-offsets:                      # Focus offsets for each filter, in steps. If empty, Altair will use the service provided ones.
+                - 0
+                - 0
+                - 0
+                - 0
+                - 0
+                - 0
+                - 0
+                - 0
+    astrometrics:
+        site-latitude: 37.2597                  # Latitude of the observatory, in decimal degrees, north is positive
+        site-longitude: -6.9325                 # Longitude of the observatory, in decimal degrees, east is positive
+        site-elevation: 130.0                   # Elevation of the observatory, in meters
+        horizon-line: 3.0                       # Horizon line, in degrees, above which the telescope can see
+        dawn-line: -18.0                        # Dawn line, in degrees, that marks the point where the sun is considered to completely set/rise
+
+
+
+

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" data-bs-theme="dark">
+
+<head>
+    <th:block th:replace="~{fragments/controlpanel.html :: mainHead}">
+        <!-- Loads head from the fragments using Thymeleaf -->
+    </th:block>
+    <link href="/css/noArrowsOnInput.css" rel="stylesheet">
+    <title>Camera</title>
+</head>
+
+
+<body style="padding-top: 60px">
+    <nav th:replace="~{fragments/controlpanel.html :: navbar(activeLink='camera')}">
+        <!-- Loads navbar and heading from the fragments using Thymeleaf -->
+    </nav>
+    <main style="padding-left: 1.5rem; padding-right: 1.5rem">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col mx-auto">
+                <div class="card h-100 text-bg-primary" style="max-width: 32rem; min-width: 15rem">
+                    <div class="card-header"><h5 class="card-title">Status</h5></div>
+                    <div class="card-body text-bg-light">
+                        <div class="row flex-nowrap">
+                            <div class="col-auto">
+                                <p class="card-text">
+                                    Connected: <br>
+                                    Temperature: <br>
+                                    Status: <br>
+                                    Binning: <br>
+                                    Subframe: <br>
+                                    Cooler: <br>
+                                </p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text">
+                                    <span id="caConnected">???</span><br>
+                                    <span id="caTemperature">???</span> °C<br>
+                                    <span id="caStatus">???</span><br>
+                                    <span id="caBinning">???</span><br>
+                                    <span id="caSubframe">???</span><br>
+                                    <span id="caCooler">???</span><br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Camera control -->
+            <div class="col mx-auto" sec:authorize="hasRole('ADVANCED_USER')">
+
+                <div class="card text-bg-primary" style="max-width: 32rem; min-width: 15rem" id="cameraCard">
+                    <div class="card-header"><h5 class="card-title">Camera</h5></div>
+                    <div class="card-body text-bg-light">
+                        
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-primary col-5" id="caConnect">Connect</button>
+                        </div>
+
+                        <!-- Subframe -->
+                        <h5 class="text-primary-emphasis">Subframe</h5>
+                        
+                        <div class="row input-group">
+                            <div class="d-flex">
+                                <span class="input-group-text">X</span>
+                                <input type="number" class="form-control" id="caSubframeStartX" min="0" max="10000" value="0">
+                                <span class="input-group-text">Y</span>
+                                <input type="number" class="form-control" id="caSubframeStartY" min="0" max="10000" value="0">
+                                <span class="input-group-text">W</span>
+                                <input type="number" class="form-control" id="caSubframeWidth" min="0" max="10000" value="0">
+                                <span class="input-group-text">H</span>
+                                <input type="number" class="form-control" id="caSubframeHeight" min="0" max="10000" value="0">
+                                <button type="button" class="btn btn-primary" id="caSubframeButton" disabled>Set</button>
+                            </div>
+                        </div>
+                            
+                        <!-- Binning -->
+                        <h5 class="text-primary-emphasis mt-2 caBinningCtrl">Binning</h5>
+
+                        <div class="row flex-nowrap input-group justify-content-between align-items-center caBinningCtrl">
+                            <div class="col-5 d-flex">
+                                <select title="lorem" class="form-select text-bg-primary" id="caBinningX" disabled>
+                                    <th:block th:if="${(capacities != null) && (capacities.maxBinX != null)}">
+                                        <option  th:each="i : ${#numbers.sequence(1, capacities.maxBinX)}" th:value="${i}" th:text="${i}"></option>
+                                    </th:block> 
+                                </select>
+                                <span class="input-group-text hideOnSym" id="caBinningTxt">X</span>
+                                <select title="ipsum" class="form-select text-bg-primary hideOnSym" id="caBinningY" disabled>
+                                    <th:block th:if="${(capacities != null) && (capacities.maxBinY != null)}">
+                                        <option th:each="i : ${#numbers.sequence(1, capacities.maxBinY)}" th:value="${i}" th:text="${i}"></option>
+                                    </th:block>  
+                                </select>
+                            </div>
+
+
+                            <div class="col caBinningAsymCtrl">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="caBinningSym">
+                                    <label class="form-check-label" for="caBinningSym">Symmetric</label>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <button type="button" class="btn btn-primary w-100" id="caBinningSet" disabled>Set</button>
+                            </div>
+                        </div>
+
+                        <!-- Exposure -->
+                        <h5 class="text-primary-emphasis mt-2">Exposure</h5>
+                        
+                        <div class="row flex-nowrap input-group justify-content-between align-items-center">
+                            <div class="col-8 d-flex">
+                                <input type="number" class="form-control flex-fill caExposureTime" placeholder="--" min="0" max="23" id="caExposureHrs">
+                                <span class="input-group-text">H</span>
+                                <input type="number" class="form-control flex-fill caExposureTime" placeholder="--" min="0" max="59" id="caExposureMins">
+                                <span class="input-group-text">M</span>
+                                <input type="number" class="form-control flex-fill caExposureTime" placeholder="--" min="0" max="59" id="caExposureSecs">
+                                <span class="input-group-text">S</span>
+                            </div>
+                            <div class="col">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="caExposureLight" checked>
+                                    <label class="form-check-label" for="caExposureLight">Lightframe</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group col-12 my-1" role="group" id="caExposureBtns">
+                            <button type="button" class="btn btn-primary" id="caExposureStart" disabled>Start selection</button>
+                            <button type="button" class="btn btn-primary" id="caExposureStop" disabled>Stop</button>
+                            <button type="button" class="btn btn-danger" id="caExposureAbort" disabled>Abort</button>
+                        </div>
+
+                        <div class="w-100 d-flex justify-content-center my-1" id="caExposureDLBtns">
+                            <div class="btn-group col-8 my-1" role="group">
+                                <button type="button" class="btn btn-primary" id="caImgSave" disabled>Save</button>
+                                <button type="button" class="btn btn-primary" id="caImgDump" disabled>Dump</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Cooler control -->
+            <div class="col mx-auto" sec:authorize="hasRole('ADVANCED_USER')" th:if="${((capabilities != null) && capabilities.canSetCoolerTemp())}">
+
+                <div class="card text-bg-primary" style="max-width: 32rem; min-width: 15rem" id="coolerCard">
+                    <div class="card-header"><h5 class="card-title">Cooler</h5></div>
+                    <div class="card-body text-bg-light">
+                        
+                        <!-- Powering up/down controls -->
+                        <div class="row flex-nowrap justify-content-between">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary w-100 text-nowrap" id="caCoolerEnable" disabled>Turn on</button>
+                            </div>
+                            <div class="d-flex flex-row justify-content-between col-4">
+                                <span class="form-control" id="caCoolerPwr">???</span>
+                                <span class="input-group-text" id="caCoolerPwrPct">%</span>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary w-100 text-nowrap" id="caCoolerWarmup" disabled>Warmup</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Current state display -->
+                        <div class="row flex-nowrap justify-content-between my-1">
+                            <div class="d-flex justify-content-center text-center">
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateOff">Off</div>
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateWup">Warmup</div>
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateStb">Stable</div>
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateAct">Active</div>
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateCdn">Cooldown</div>
+                                <div class="border border-primary text-bg-dark col-2 caCoolerStateIndicator" id="caCoolerStateSat">Saturated</div>
+                            </div>
+                        </div>
+
+                        <!-- Cooler temp settings -->
+                        <div class="row flex-nowrap justify-content-between my-1" id="caCoolerTempSetPane">           
+                                <div class="d-flex flex-row justify-content-between align-items-center col-8">
+                                    <div class="col-8">
+                                        <label for="caCoolerTarget" class="form-label">Set target temp</label>
+                                        <input type="range" class="form-range" min="-30.0" max="30.0" step="0.5" value="0" id="caCoolerTarget">
+                                    </div>                                   
+                                    <div class="d-flex flex-row justify-content-between col-3">
+                                        <span class="form-control" id="caCoolerTgtDisp">0.0</span>
+                                        <span class="input-group-text">°C</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-row justify-content-between align-items-center col-4">   
+                                    <button type="button" class="btn btn-primary col-5 text-nowrap" id="caCoolerTargetSet" disabled>Set</button>
+                                    <button type="button" class="btn btn-primary col-5 text-nowrap" id="caCoolerTargetEase" disabled>Ease</button>
+                                </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FilterWheel settings -->
+            <div class="col mx-auto" sec:authorize="hasRole('ADVANCED_USER')">
+
+                <div class="card text-bg-primary" style="max-width: 32rem; min-width: 15rem" id="filterWheelCard">
+                    <div class="card-header"><h5 class="card-title">Filter Wheel</h5></div>
+                    <div class="card-body text-bg-light">
+                        
+                        <!-- Powering up/down controls and current filter -->
+                        <div class="row flex-nowrap justify-content-between">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-primary w-100 text-nowrap" id="fwConnect" disabled>Connect</button>
+                            </div>
+                            <div class="d-flex justify-content-end col-8 align-items-center">
+                                <p class="card-text">Current: <span id="fwCurrentName">?????</span> Pos: <span id="fwCurrentPos">???</span> Offset: <span id="fwCurrentOff">?????</span> </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Filter selection -->
+                        
+                        <div class="row flex-nowrap align-items-center justify-content-between my-1">
+                            <div class="col-3">
+                                <button type="button" class="btn btn-primary w-100 text-nowrap" id="fwChangeTo" disabled>Change</button>
+                            </div>
+                            <div class="col-auto align-items-center">
+                                <label class="form-label" for="fwSelect">Available filters:</label>
+                            </div>
+                            <div class="col-5 align-items-center">
+                                <select class="form-select text-bg-primary-emphasis" id="fwSelect" disabled>
+                                    <!-- Populated by JS -->
+                                </select>
+                            </div>    
+                        </div>                         
+                    </div>
+                </div>
+
+            </div>
+        </div>      
+    </main>
+
+
+    <th:block th:replace="~{fragments/controlpanel.html :: bottomDefs}"/>
+    <script th:inline="javascript">
+        var capabilities = /*[[${capabilities}]]*/ null;
+    </script>
+    <script src="/js/camera.js"></script>
+    <script src="/js/filterwheel.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6" data-bs-theme="dark">
+
+<head>
+    <th:block th:replace="~{fragments/controlpanel.html :: mainHead}">
+        <!-- Loads head from the fragments using Thymeleaf -->
+    </th:block>
+    <link href="/css/noArrowsOnInput.css" rel="stylesheet">
+    <title>Focuser</title>
+</head>
+
+<body style="padding-top: 60px">
+    <nav th:replace="~{fragments/controlpanel.html :: navbar(activeLink='focuser')}">
+        <!-- Loads navbar and heading from the fragments using Thymeleaf -->
+    </nav>
+
+    <main style="padding-left: 1.5rem; padding-right: 1.5rem">
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+            <div class="col mx-auto">
+                <div class="card h-100 text-bg-primary" style="max-width: 32rem; min-width: 15rem">
+                    <div class="card-header"><h5 class="card-title">Status</h5></div>
+                    <div class="card-body text-bg-light">
+                        <div class="row flex-nowrap">
+                            <div class="col-auto">
+                                <p class="card-text">
+                                    Connected: <br>
+                                    Position: <br>
+                                    Temperature: <br>
+                                    Compensation: <br>
+                                    Moving: <br>
+                                </p>
+                            </div>
+                            <div class="col">
+                                <p class="card-text">
+                                    <span id="fcConnected">???</span><br>
+                                    <span id="fcPosition">???</span> steps<br>
+                                    <span id="fcTemperature">???</span> °C<br>
+                                    <span id="fcTempComp">???</span><br>
+                                    <span id="fcMoving">???</span><br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col mx-auto" sec:authorize="hasRole('ADVANCED_USER')">
+                <div class="card h-100 text-bg-primary" style="max-width: 32rem; min-width: 25rem" id="controlPanel">
+                    <div class="card-header"><h5 class="card-title">Control</h5></div>
+                    <div class="card-body text-bg-light">
+                        <div class="container text-center">
+                            <div class="row justify-content-around flex-nowrap">
+                                <div class="col-auto align-self-end justify-content-end me-auto">
+                                    <p>Move In<p>
+                                    <div class="btn-group" role="group" id="fcInBtnGroup" disabled>
+                                      <button type="button" class="btn btn-primary" id="fcIn3" data-steps="100"><i class="bi bi-skip-backward-fill" disabled></i></button>
+                                      <button type="button" class="btn btn-primary" id="fcIn2" data-steps="10"><i class="bi bi-skip-start-fill" disabled></i></button>
+                                      <button type="button" class="btn btn-primary" id="fcIn1" data-steps="1"><i class="bi bi-caret-left-fill" disabled></i></button>
+                                    </div>
+                                </div>
+                                <div class="col align-self-end d-inline-block">
+                                    <button type="button" class="btn btn-primary w-100 text-nowrap" id="fcConnect" disabled>Connect</button>
+                                    <p>Current position: <span class="form-control" id="fcPositionTxt">???</span></p>
+                                    <button type="button" class="btn btn-primary w-100 text-bg-danger" id="fcAbort" disabled>
+                                        <i class="bi bi-sign-stop"></i>
+                                    </button>
+                                </div>
+                                <div class="col-auto align-self-end justify-content-start ms-auto">
+                                    <p>Move Out<p>
+                                    <div class="btn-group" role="group" id="fcOutBtnGroup" disabled>
+                                      <button type="button" class="btn btn-primary" id="fcOut1" data-steps="1"><i class="bi bi-caret-right-fill" disabled></i></button>
+                                      <button type="button" class="btn btn-primary" id="fcOut2" data-steps="10"><i class="bi bi-skip-end-fill" disabled></i></button>
+                                      <button type="button" class="btn btn-primary" id="fcOut3" data-steps="100"><i class="bi bi-skip-forward-fill" disabled></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    </div> 
+                    <ul class="list-group list-group-flush w-100 text-bg-secondary">
+                        <li class="list-group-item text-bg-light">
+                            <div class="row justify-content-center flex-nowrap">
+                                <div class="col-auto align-self-center form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="fcTempCompToggle" disabled>
+                                    <label class="form-check-label" for="fcTempCompToggle">Compensation</label>
+                                </div>
+                                <div class="col align-self-center justify-content-end input-group">
+                                    <input type="number" class="form-control" id="fcMoveToTxt" placeholder="Move to...">
+                                    <button type="button" class="btn btn-primary" id="fcMoveToBtn" disabled>Go</button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>      
+                </div>
+            </div>
+        </div>      
+    </main>
+
+
+    <th:block th:replace="~{fragments/controlpanel.html :: bottomDefs}"/>
+    <script th:inline="javascript">
+        var capabilities = /*[[${capabilities}]]*/ null;
+    </script>
+    <script src="/js/focuser.js"></script>
+</body>
+
+</html>
